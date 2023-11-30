@@ -1,0 +1,38 @@
+on:
+  push:
+    branches: main
+    paths:
+    - src/Services/Coupon/**
+    - tests/Services/Coupon/**
+
+env:
+  DOTNET_CLI_TELEMETRY_OPTOUT: true
+  DOTNET_NOLOGO: true
+
+jobs:
+  build-and-push-docker-image:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Get code from the repository
+      uses: actions/checkout@v1
+      with:
+        ref: main
+
+    - name: Run unit tests
+      run: dotnet test tests/Services/Coupon/*.Tests/*.csproj
+        
+    - name: Docker Login
+      uses: docker/login-action@v3.0.0
+      with:
+        registry: ${{ secrets.REGISTRY_LOGIN_SERVER }}
+        username: ${{ secrets.REGISTRY_USERNAME }}
+        password: ${{ secrets.REGISTRY_PASSWORD }}
+
+    - name: Build and push Docker images
+      uses: docker/build-push-action@v5.1.0
+      with:
+        context: .
+        push: true
+        tags: 'linux-net6-coupon'
+        file: './src/Services/Coupon/Coupon.API/Dockerfile.acr'
+        repository: 'coupon.api'
