@@ -33,6 +33,5 @@ jobs:
       with:
         context: .
         push: true
-        tags: 'linux-net6-coupon'
+        tags: ${{secrets.REGISTRY_LOGIN_SERVER}}/coupon.api:linux-net6-coupon
         file: './src/Services/Coupon/Coupon.API/Dockerfile.acr'
-        repository: 'coupon.api'
